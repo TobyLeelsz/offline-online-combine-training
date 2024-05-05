@@ -8,34 +8,29 @@ Here is an overview of the main files and directories in this repository:
 
 ```plaintext
 D:.
-│   buffer_ablation.py    # Script for ablation studies on the buffer
-│   main.py               # Main script to run experiments
-│   README.md             # This file
-│   requirements.txt      # Python dependencies for the project
-│   tree.txt              # File tree structure
+│   buffer_ablation.py     # Script for ablation studies on the buffer
+│   main.py                # Main script to run experiments
+│   paper.pdf              # Project report
+│   README.md              # This file
+│   requirements.txt       # Python dependencies for the project
+│   tree.txt               # File tree structure
 │
 ├───CQL-SAC-Combine
-│   │   agent.py          # Agent implementation for the hybrid model
-│   │   buffer.py         # Replay buffer for the hybrid model
-│   │   eval.py           # Evaluation script for the hybrid model
-│   │   networks.py       # Neural network architectures
-│   │   train.py          # Training loop for the hybrid model
-│   │   utils.py          # Utility functions
-│   │
-│   └───__pycache__
-│           *.pyc
+│       agent.py           # Agent implementation for the hybrid model
+│       buffer.py          # Replay buffer for the CQL-SAC model
+│       eval.py            # Evaluation script for the CQL-SAC model
+│       networks.py        # Neural network architectures
+│       train.py           # Training loop for the CQL-SAC model
+│       utils.py           # Utility functions
 │
 └───SAC-Online
-    │   agent.py          # Agent implementation for SAC
-    │   buffer.py         # Replay buffer for SAC
-    │   eval.py           # Evaluation script for SAC
-    │   generate_dataset.py # Script to generate datasets from SAC
-    │   networks.py       # Neural network architectures
-    │   train.py          # Training loop for SAC
-    │   utils.py          # Utility functions
-    │
-    └───__pycache__
-            *.pyc
+        agent.py           # Agent implementation for SAC
+        buffer.py          # Replay buffer for SAC
+        eval.py            # Evaluation script for SAC
+        generate_dataset.py   # Script to generate datasets from SAC
+        networks.py        # Neural network architectures
+        train.py           # Training loop for SAC
+        utils.py           # Utility functions
 ```
 
 ## Installation
@@ -74,6 +69,7 @@ python main.py
 ```
 
 This script will train a SAC agent, generate a dataset, and then train a CQL-SAC hybrid agent using the combined online and offline data.
+**Note**: Administrator privileges are required to run the script.
 
 ## Customizing Experiments
 

@@ -22,5 +22,5 @@ def buffer_n(n:int):
             exit(1)
 
 if __name__ == '__main__':
-    for n in ['160','600']:
+    for n in range(50,711,110):
         buffer_n(n)
