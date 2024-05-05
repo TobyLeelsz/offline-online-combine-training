@@ -46,7 +46,7 @@ To run the code, follow these setup instructions:
 
    ```bash
    git clone https://github.com/TobyLeelsz/offline-online-combine-training.git
-   cd lunar-lander-sac-cql
+   cd offline-online-combine-training
    ```
 
 2. **Install dependencies:**
