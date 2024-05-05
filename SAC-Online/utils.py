@@ -2,7 +2,7 @@ import torch
 
 def save(args, save_name, model, wandb, ep=None):
     import os
-    save_dir = './trained_models/' 
+    save_dir = './trained_models/'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     if not ep == None:

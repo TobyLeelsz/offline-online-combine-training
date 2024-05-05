@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.distributions import Categorical 
+from torch.distributions import Categorical
 import numpy as np
 import torch.nn.functional as F
 
@@ -24,7 +24,7 @@ class Actor(nn.Module):
             fc2_units (int): Number of nodes in second hidden layer
         """
         super(Actor, self).__init__()
-        
+
         self.fc1 = nn.Linear(state_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, action_size)
@@ -36,7 +36,7 @@ class Actor(nn.Module):
         x = F.relu(self.fc2(x))
         action_probs = self.softmax(self.fc3(x))
         return action_probs
-    
+
     def evaluate(self, state, epsilon=1e-6):
         action_probs = self.forward(state)
 
@@ -46,8 +46,8 @@ class Actor(nn.Module):
         z = action_probs == 0.0
         z = z.float() * 1e-8
         log_action_probabilities = torch.log(action_probs + z)
-        return action.detach().cpu(), action_probs, log_action_probabilities        
-    
+        return action.detach().cpu(), action_probs, log_action_probabilities
+
     def get_action(self, state):
         """
         returns the action based on a squashed gaussian policy. That means the samples are obtained according to:
@@ -62,7 +62,7 @@ class Actor(nn.Module):
         z = z.float() * 1e-8
         log_action_probabilities = torch.log(action_probs + z)
         return action.detach().cpu(), action_probs, log_action_probabilities
-    
+
     def get_det_action(self, state):
         action_probs = self.forward(state)
         dist = Categorical(action_probs)

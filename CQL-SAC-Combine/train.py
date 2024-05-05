@@ -1,7 +1,4 @@
-
-
 import gym
-import pybullet_envs
 import numpy as np
 from collections import deque
 import torch
@@ -17,14 +14,15 @@ from agent import CQLSAC
 def get_config():
     parser = argparse.ArgumentParser(description='RL')
     parser.add_argument("--run_name", type=str, default="CQL-SAC-discrete", help="Run name, default: CQL-SAC")
-    parser.add_argument("--env", type=str, default="LunarLander-v2", help="Gym environment name, default: CartPole-v0")
-    parser.add_argument("--episodes", type=int, default=1000, help="Number of episodes, default: 200")
+    parser.add_argument("--env", type=str, default="LunarLander-v2", help="Gym environment name, default: LunarLander-v2")
+    parser.add_argument("--episodes", type=int, default=1000, help="Number of episodes, default: 1000")
+    parser.add_argument("--n_episode", type=int, default=1000)
     parser.add_argument("--buffer_size", type=int, default=10_000_000, help="Maximal training dataset size, default: 100_000")
     parser.add_argument("--seed", type=int, default=1, help="Seed, default: 1")
-    parser.add_argument("--log_video", type=int, default=0, help="Log agent behaviour to wanbd when set to 1, default: 0")
-    parser.add_argument("--save_every", type=int, default=100, help="Saves the network every x epochs, default: 25")
+    parser.add_argument("--log_video", type=int, default=0, help="Log agent behaviour to wandb when set to 1, default: 0")
+    parser.add_argument("--save_every", type=int, default=100, help="Saves the network every x epochs, default: 100")
     parser.add_argument("--batch_size", type=int, default=256, help="Batch size, default: 256")
-    
+
     args = parser.parse_args()
     return args
 
@@ -33,21 +31,21 @@ def train(config):
     random.seed(config.seed)
     torch.manual_seed(config.seed)
     env = gym.make(config.env)
-    
+
     env.seed(config.seed)
     env.action_space.seed(config.seed)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
+
     steps = 0
     average10 = deque(maxlen=10)
-    with open("offline_dataset.dat", "rb") as f:
+    with open(f"datasets\\offline_dataset{config.n_episode}.dat", "rb") as f:
         dataset = pickle.load(f)
 
     total_steps = 0
-    
+
     with wandb.init(project="CQL", name=config.run_name, config=config):
-        
+
         agent = CQLSAC(state_size=env.observation_space.shape[0],
                          action_size=env.action_space.n,
                          device=device)
@@ -64,9 +62,9 @@ def train(config):
                 cnt += 1
 
         print("Buffer Size:", cnt)
-        
+
         collect_random(env=env, dataset=buffer, num_samples=1000)
-        
+
         if config.log_video:
             env = gym.wrappers.Monitor(env, './video', video_callable=lambda x: x%10==0, force=True)
 
@@ -86,12 +84,10 @@ def train(config):
                 if done:
                     break
 
-            
-
             average10.append(rewards)
             total_steps += episode_steps
             print("Episode: {} | Reward: {} | Polciy Loss: {} | Steps: {}".format(i, rewards, policy_loss, steps,))
-            
+
             wandb.log({"Reward": rewards,
                        "Average10": np.mean(average10),
                        "Steps": total_steps,

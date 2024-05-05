@@ -1,16 +1,13 @@
 import gym
-import pybullet_envs
 import numpy as np
 from collections import deque
 import torch
-import wandb
 import argparse
 from buffer import ReplayBuffer
-import glob
 from utils import save, collect_random
-import random
 import pickle
 from agent import SAC
+import os
 
 
 def get_config():
@@ -38,7 +35,7 @@ def generate_dataset(config):
     agent = SAC(state_size=env.observation_space.shape[0],
                          action_size=env.action_space.n,
                          device=device)
-    actor_state_dict = torch.load("trained_models/SACSAC_discrete0.pth", map_location=device)
+    actor_state_dict = torch.load(f"trained_models/SACSAC_discrete{config.episodes}.pth", map_location=device)
     agent.actor_local.load_state_dict(actor_state_dict)
     n_episode = config.n_episode
 
@@ -75,17 +72,13 @@ def generate_dataset(config):
         done_list = np.array(done_list)
 
         paths.append([state_list, action_list, reward_list, next_state_list, done_list])
-        
+
         print(f"Episode {i} Return: {episode_return}")
 
-    with open("offline_dataset.dat", "wb") as f:
+    dataset_path = f"datasets/offline_dataset{n_episode}.dat"
+    os.makedirs(os.path.dirname(dataset_path), exist_ok=True)
+    with open(dataset_path, "wb") as f:
         pickle.dump(paths, f)
-
-
-
-
-
-
 
 if __name__ == "__main__":
     config = get_config()

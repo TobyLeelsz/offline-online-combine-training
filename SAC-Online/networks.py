@@ -25,7 +25,7 @@ class Actor(nn.Module):
         x = F.relu(self.fc2(x))
         action_probs = self.softmax(self.fc3(x))
         return action_probs
-    
+
     def evaluate(self, state, epsilon=1e-6):
         action_probs = self.forward(state)
 
@@ -35,8 +35,8 @@ class Actor(nn.Module):
         z = action_probs == 0.0
         z = z.float() * 1e-8
         log_action_probabilities = torch.log(action_probs + z)
-        return action.detach().cpu(), action_probs, log_action_probabilities        
-    
+        return action.detach().cpu(), action_probs, log_action_probabilities
+
     def get_action(self, state):
         action_probs = self.forward(state)
 
@@ -47,7 +47,7 @@ class Actor(nn.Module):
         z = z.float() * 1e-8
         log_action_probabilities = torch.log(action_probs + z)
         return action.detach().cpu(), action_probs, log_action_probabilities
-    
+
     def get_det_action(self, state):
         action_probs = self.forward(state)
         dist = Categorical(action_probs)

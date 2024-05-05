@@ -8,7 +8,7 @@ import copy
 
 
 class SAC(nn.Module):
-    
+
     def __init__(self,
                         state_size,
                         action_size,
@@ -19,7 +19,7 @@ class SAC(nn.Module):
         self.action_size = action_size
 
         self.device = device
-        
+
         self.gamma = 0.99
         self.tau = 1e-2
         hidden_size = 256
@@ -30,20 +30,20 @@ class SAC(nn.Module):
 
         self.log_alpha = torch.tensor([0.0], requires_grad=True)
         self.alpha = self.log_alpha.exp().detach()
-        self.alpha_optimizer = optim.Adam(params=[self.log_alpha], lr=learning_rate) 
-                
-        # Actor Network 
+        self.alpha_optimizer = optim.Adam(params=[self.log_alpha], lr=learning_rate)
+
+        # Actor Network
 
         self.actor_local = Actor(state_size, action_size, hidden_size).to(device)
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=learning_rate)     
-        
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=learning_rate)
+
         # Critic Network (w/ Target Network)
 
         self.critic1 = Critic(state_size, action_size, hidden_size, 2).to(device)
         self.critic2 = Critic(state_size, action_size, hidden_size, 1).to(device)
-        
+
         assert self.critic1.parameters() != self.critic2.parameters()
-        
+
         self.critic1_target = Critic(state_size, action_size, hidden_size).to(device)
         self.critic1_target.load_state_dict(self.critic1.state_dict())
 
@@ -51,12 +51,12 @@ class SAC(nn.Module):
         self.critic2_target.load_state_dict(self.critic2.state_dict())
 
         self.critic1_optimizer = optim.Adam(self.critic1.parameters(), lr=learning_rate)
-        self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=learning_rate) 
+        self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=learning_rate)
 
-    
+
     def get_action(self, state):
         state = torch.from_numpy(state).float().to(self.device)
-        
+
         with torch.no_grad():
             action = self.actor_local.get_det_action(state)
         return action.numpy()
@@ -64,13 +64,13 @@ class SAC(nn.Module):
     def calc_policy_loss(self, states, alpha):
         _, action_probs, log_pis = self.actor_local.evaluate(states)
 
-        q1 = self.critic1(states)   
+        q1 = self.critic1(states)
         q2 = self.critic2(states)
         min_Q = torch.min(q1,q2)
         actor_loss = (action_probs * (alpha * log_pis - min_Q )).sum(1).mean()
         log_action_pi = torch.sum(log_pis * action_probs, dim=1)
         return actor_loss, log_action_pi
-    
+
     def learn(self, step, experiences, gamma, d=1):
         states, actions, rewards, next_states, dones = experiences
 
@@ -80,7 +80,7 @@ class SAC(nn.Module):
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
-        
+
         # Compute alpha loss
         alpha_loss = - (self.log_alpha.exp() * (log_pis.cpu() + self.target_entropy).detach().cpu()).mean()
         self.alpha_optimizer.zero_grad()
@@ -97,12 +97,12 @@ class SAC(nn.Module):
             Q_target_next = action_probs * (torch.min(Q_target1_next, Q_target2_next) - self.alpha.to(self.device) * log_pis)
 
             # Compute Q targets for current states (y_i)
-            Q_targets = rewards + (gamma * (1 - dones) * Q_target_next.sum(dim=1).unsqueeze(-1)) 
+            Q_targets = rewards + (gamma * (1 - dones) * Q_target_next.sum(dim=1).unsqueeze(-1))
 
         # Compute critic loss
         q1 = self.critic1(states).gather(1, actions.long())
         q2 = self.critic2(states).gather(1, actions.long())
-        
+
         critic1_loss = 0.5 * F.mse_loss(q1, Q_targets)
         critic2_loss = 0.5 * F.mse_loss(q2, Q_targets)
 
@@ -121,10 +121,10 @@ class SAC(nn.Module):
         # ----------------------- update target networks ----------------------- #
         self.soft_update(self.critic1, self.critic1_target)
         self.soft_update(self.critic2, self.critic2_target)
-        
+
         return actor_loss.item(), alpha_loss.item(), critic1_loss.item(), critic2_loss.item(), current_alpha
 
     def soft_update(self, local_model , target_model):
-        
+
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(self.tau*local_param.data + (1.0-self.tau)*target_param.data)
