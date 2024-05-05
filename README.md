@@ -1,6 +1,6 @@
 # Enhancing Lunar Lander Performance with Offline-online combined CQL-SAC Approaches
 
-This repository contains the implementation of a hybrid Soft Actor-Critic (SAC) and Conservative Q-Learning (CQL) approach to solve the Lunar Lander problem in OpenAI's Gym environment. The project aims to develop an agent capable of safely landing on the moon while optimizing fuel usage and minimizing risks.
+[This repository](https://github.com/TobyLeelsz/offline-online-combine-training) contains the implementation of a hybrid Soft Actor-Critic (SAC) and Conservative Q-Learning (CQL) approach to solve the Lunar Lander problem in OpenAI's Gym environment. The project aims to develop an agent capable of safely landing on the moon while optimizing fuel usage and minimizing risks.
 
 ## Project Structure
 
