@@ -45,7 +45,7 @@ To run the code, follow these setup instructions:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-github/lunar-lander-sac-cql.git
+   git clone https://github.com/TobyLeelsz/offline-online-combine-training.git
    cd lunar-lander-sac-cql
    ```
 
