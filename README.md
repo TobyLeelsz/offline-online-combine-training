@@ -77,7 +77,9 @@ This script will train a SAC agent, generate a dataset, and then train a CQL-SAC
 
 ## Customizing Experiments
 
-Modify `main.py` to tweak hyperparameters or change the training configuration. You can also run `buffer_ablation.py` to perform ablation studies on the buffer size and its effects.
+Modify `main.py` to tweak hyperparameters or change the training configuration. For computation convinience, it is recommended to set the parameters `episodes` and `n_episode` to smaller values.
+
+You may also run `buffer_ablation.py` to perform ablation studies on the buffer size and its effects.
 
 ## Contributing
 
